@@ -148,3 +148,23 @@ Or you can directly install on the current system with:
 
 Enjoy!
 
+### Building on Apple Silicon (arm64, e.g., M4)
+
+If you installed libssh with Homebrew on an Apple Silicon Mac, you can build
+an arm64 binary like this:
+
+```
+mkdir -p build
+cd build
+cmake .. \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_OSX_ARCHITECTURES=arm64 \
+  -DCMAKE_PREFIX_PATH=/opt/homebrew \
+  -DCMAKE_CXX_FLAGS="-I/opt/homebrew/include" \
+  -DCMAKE_EXE_LINKER_FLAGS="-L/opt/homebrew/lib"
+cmake --build . --config Release --target sshping -- -j8
+```
+
+Note: the default `man` target writes to `doc/sshping.8`. If your build
+environment restricts writing outside the build directory, build only the
+`sshping` target as shown above.

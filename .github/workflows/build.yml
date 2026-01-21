@@ -1,0 +1,37 @@
+name: Build on Tag (macOS arm64)
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          brew update
+          brew install libssh
+
+      - name: Configure
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_OSX_ARCHITECTURES=arm64 \
+            -DCMAKE_PREFIX_PATH=/opt/homebrew \
+            -DCMAKE_CXX_FLAGS="-I/opt/homebrew/include" \
+            -DCMAKE_EXE_LINKER_FLAGS="-L/opt/homebrew/lib"
+
+      - name: Build
+        run: cmake --build build --config Release --target sshping -- -j"$(sysctl -n hw.ncpu)"
+
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: sshping-macos-arm64
+          path: build/sshping
